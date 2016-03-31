@@ -31,13 +31,6 @@
   - name: Create /etc/origin directory
     command: mkdir -p /etc/origin
 
-  - name: Create aws.conf ini file
-    ini_file:
-      dest: /etc/origin/aws.conf
-      section: Global
-      option: Zone
-      value: "{{ ec2_placement }}"
-
   # ultimately we are setting the kube resolver as the first resolver
   # so we need to turn off DNS checking in SSHD otherwise connections
   # take a very long time
@@ -63,23 +56,9 @@
     openshift_cluster_id: "{{ cluster_id }}"
     openshift_debug_level: "{{ debug_level }}"
     openshift_node_debug_level: "{{ node_debug_level | default(debug_level, true) }}"
-    osm_controller_args:
-      cloud-provider:
-      - "aws"
-      cloud-config:
-      - "/etc/origin/aws.conf"
-    osm_api_server_args:
-      cloud-provider:
-      - "aws"
-      cloud-config:
-      - "/etc/origin/aws.conf"
     openshift_node_kubelet_args:
       max-pods:
       - "100"
-      cloud-provider:
-      - "aws"
-      cloud-config:
-      - "/etc/origin/aws.conf"
     openshift_master_debug_level: "{{ master_debug_level | default(debug_level, true) }}"
     openshift_master_access_token_max_seconds: 2419200
     openshift_master_identity_providers: "{{ identity_providers }}"
@@ -96,6 +75,7 @@
     openshift_master_cluster_method: native
     openshift_master_cluster_hostname: openshift.internal.{{ r53_host_zone }}
     openshift_master_cluster_public_hostname: openshift.{{ r53_host_zone }}
+    openshift_cloudprovider_kind: aws
     os_firewall_enabled: False
 
 # Router, Registry, internal users and projects, priming
